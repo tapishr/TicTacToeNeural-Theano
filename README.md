@@ -1,5 +1,5 @@
 # TicTacToeNeural-Theano
-In this project, a convolutional neural network is tries to learn to play a variant of tic-tac-toe.
+In this project, a convolutional neural network tries to learn how to play a variant of tic-tac-toe.
 ### Rules of the game
 1. The first player to get 5 continous Xs or Os in a row, column or diagnol wins.
 
