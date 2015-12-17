@@ -21,5 +21,5 @@ Winning in a right to left diagonal -
 
 Winning in a left to right diagonal -
 
-![Winning in a Row image](https://github.com/tapishr/TicTacToeNeural-Theano/blob/master/Markdown/Images/winning_in_row.png)
+![Winning in a Row image](https://github.com/tapishr/TicTacToeNeural-Theano/blob/master/Markdown/Images/winning_in_lrdiagonal.png)
 
