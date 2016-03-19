@@ -5,6 +5,8 @@ from theano.tensor.nnet import conv
 
 class DeepLearner:
 
+	LEARNING_RATE = 0.8
+
 	def __init__(self, init_params = None):
 
 		self.input_board = T.dmatrix('input_board')
@@ -97,7 +99,7 @@ class DeepLearner:
 		cost = T.sqr(reward - self.output[0])
 		grads = T.grad(cost, self.params)
 		updates = [
-				(param_i, param_i - 0.8 * grad_i) 
+				(param_i, param_i - LEARNING_RATE * grad_i) 
 				for param_i, grad_i in zip(self.params, grads)
 				]
 		gradF = theano.function(

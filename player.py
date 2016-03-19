@@ -1,6 +1,7 @@
 import numpy as np
 import random
-from learner import DeepLearner
+#from learner import DeepLearner
+from learner3X3 import DeepLearner
 
 class TicTacToePlayer:
 

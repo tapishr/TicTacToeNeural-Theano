@@ -4,6 +4,9 @@ import theano.tensor as T
 
 class DeepLearner:
 
+	LEARNING_RATE_LEGAL_MOVES = 0.5
+	LEARNING_RATE_STRATEGY = 0.07
+
 	def __init__(self, init_params = None):
 
 		self.input_board = T.dmatrix('input_board')
@@ -26,7 +29,7 @@ class DeepLearner:
 
 	
 			n_in_layer1 = n_out_layer0
-			n_out_layer1 = 1
+			n_out_layer1 = 9
 			W_bound_layer1 = numpy.sqrt(6. / (n_in_layer1 + n_out_layer1))
 			W_layer1 = theano.shared(
 					numpy.asarray(
@@ -50,11 +53,11 @@ class DeepLearner:
 		self.params = [W_layer0, b_layer0] + [W_layer1, b_layer1]
 		
 		
-		layer0_output = T.tanh(T.dot(self.input_board.flatten(), W_layer0) + b_layer0)
+		layer0_output = T.nnet.sigmoid(T.dot(self.input_board.flatten(), W_layer0) + b_layer0)
  
 		layer1_input = layer0_output
 		
-		self.output = T.tanh(T.dot(layer1_input, W_layer1) + b_layer1)
+		self.output = T.nnet.softmax(T.dot(layer1_input, W_layer1) + b_layer1)
 		
 
 
@@ -63,19 +66,19 @@ class DeepLearner:
 
 		f = theano.function(
 			[self.input_board],
-			self.output[0],
+			self.output,
 		)
 		return f(input_board_value)
 
 
 
-	def assign_reward(self, reward_value, input_board_value):
+	def update_weights(self, reward_value, input_board_value):
 
-		reward = T.lscalar()
-		cost = T.sqr(reward - self.output[0])
+		target_vector = T.ivector()
+		cost = T.nnet.binary_crossentropy(self.output[], target_vector).mean()
 		grads = T.grad(cost, self.params)
 		updates = [
-				(param_i, param_i - 0.07 * grad_i) 
+				(param_i, param_i - LEARNING_RATE_STRATEGY * grad_i) 
 				for param_i, grad_i in zip(self.params, grads)
 				]
 		gradF = theano.function(
@@ -83,7 +86,7 @@ class DeepLearner:
 					cost,
 					updates = updates,
 					givens={
-						reward:reward_value
+						target_vector:target_value
 					}
 				)
 		return gradF(input_board_value)

@@ -2,6 +2,11 @@ import numpy as np
 
 class TicTacToeJudge:
 
+	TIE_MARK = -2
+	PLAYER1_MARK = 1
+	PLAYER2_MARK = -1
+	NO_WINNER_MARK = 0
+	
 	def __init__ (self):
 		self.board = []
 
@@ -24,16 +29,16 @@ class TicTacToeJudge:
 
 	def get_result(self, board):
 		self.board = board
-		winner = 0
+		winner = NO_WINNER_MARK
 		for index, x in np.ndenumerate(self.board):
 			if x == 1 or x == -1 :
 				winner = self.get_winner(index)
-				if winner != 0:
+				if winner != NO_WINNER_MARK:
 					break
 		
 		# Tie Condition
-		if sum(sum(board == 0)) == 0 and winner == 0:  
-			winner = -2
+		if sum(sum(board == 0)) == 0 and winner == NO_WINNER_MARK:  
+			winner = TIE_MARK
 
 		return winner
 
