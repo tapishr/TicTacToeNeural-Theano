@@ -1,102 +1,159 @@
 import numpy
+import cPickle
 import theano
 import theano.tensor as T
 
-class DeepLearner:
+LEARNING_RATE = 0.09
 
-	LEARNING_RATE_LEGAL_MOVES = 0.5
-	LEARNING_RATE_STRATEGY = 0.07
 
-	def __init__(self, init_params = None):
+class HiddenLayer(object):
 
-		self.input_board = T.dmatrix('input_board')
+	def __init__(self, inputVector, n_in, n_nodes, activation, W = None, b = None):
+
+		if W is None:
+			
+			rng = numpy.random.RandomState(23452)
+			n_out = n_nodes
+			W_bound = numpy.sqrt(6. / (n_in + n_out))
+
+			W = theano.shared(
+				name = 'W_HiddenLayer',
+				value = numpy.asarray(
+					rng.uniform(
+						low = - W_bound,
+						high = W_bound,
+						size = (n_in, n_out)),
+					dtype = theano.config.floatX),
+				)
+			# if activation == T.nnet.sigmoid :
+			# 	W *= 4
+		self.W = W
 		
-		rng = numpy.random.RandomState(23455)
-		n_in_layer0 = 9
-		n_out_layer0 = 18
-		W_bound_layer0 = numpy.sqrt(6. / (n_in_layer0 + n_out_layer0))	
-		if init_params is None:
-			W_layer0 = theano.shared(
-					numpy.asarray(
-						rng.uniform(
-							low = -W_bound_layer0, 
-							high = W_bound_layer0, 
-							size = (n_in_layer0, n_out_layer0)),
-						dtype = theano.config.floatX),
-					borrow = True)
-			b_value_layer0 = numpy.zeros((n_out_layer0,), dtype = theano.config.floatX)
-			b_layer0 = theano.shared(value = b_value_layer0, borrow = True)
+		if b is None:
+			b = theano.shared(
+				name = 'b_HiddenLayer',
+				value = numpy.zeros( 
+					n_out, 
+					dtype = theano.config.floatX))
+		self.b = b
+		
+		self.output = activation (T.dot(inputVector, self.W) + self.b)
+
+		self.params = [self.W, self.b]
+
+
+
+class OutputLayerQscore(object) :
+
+	def __init__ (self, inputVector, n_in, n_nodes, W = None, b = None):
+		 
+		if W is None:
+		 	rng = numpy.random.RandomState(23452)
+			n_out = n_nodes
+			W_bound = numpy.sqrt(6. / (n_in + n_out))
+
+			W = theano.shared(
+				name = 'W_OutputLayer',
+				value = numpy.asarray(
+					rng.uniform(
+						low = - W_bound,
+						high = W_bound,
+						size = (n_in, n_out)),
+					dtype = theano.config.floatX),
+				)
+		self.W = W
+
+		if b is None:
+			b = theano.shared(
+				name = 'b_OutputLayer',
+				value = numpy.zeros( 
+					n_out, 
+					dtype = theano.config.floatX))
+		self.b = b
+
+		self.output = T.nnet.sigmoid(T.dot(inputVector, W) + b)
+
+		self.params = [self.W, self.b]
 
 	
-			n_in_layer1 = n_out_layer0
-			n_out_layer1 = 9
-			W_bound_layer1 = numpy.sqrt(6. / (n_in_layer1 + n_out_layer1))
-			W_layer1 = theano.shared(
-					numpy.asarray(
-						rng.uniform(
-							low = -W_bound_layer1, 
-							high = W_bound_layer1, 
-							size = (n_in_layer1, n_out_layer1)),
-						dtype = theano.config.floatX),
-					borrow = True)
-			b_value_layer1 = numpy.zeros((n_out_layer1,), dtype = theano.config.floatX)
-			b_layer1 = theano.shared(value = b_value_layer1, borrow = True)
-			
-		else:
-			
-			W_layer0 = theano.shared(value = init_params[0], borrow = True)
-			b_layer0 = theano.shared(value = init_params[1], borrow = True)
-			W_layer1 = theano.shared(value = init_params[2], borrow = True)
-			b_layer1 = theano.shared(value = init_params[3], borrow = True)
-			
+	def cost(self, y):
+		if y.ndim != self.output.ndim:
+			raise TypeError(
+				'y should have the same shape as self.output',
+				('y', y.type, 'self.output', self.output.type)
+				)
 
-		self.params = [W_layer0, b_layer0] + [W_layer1, b_layer1]
-		
-		
-		layer0_output = T.nnet.sigmoid(T.dot(self.input_board.flatten(), W_layer0) + b_layer0)
- 
-		layer1_input = layer0_output
-		
-		self.output = T.nnet.softmax(T.dot(layer1_input, W_layer1) + b_layer1)
-		
+		return -T.nnet.binary_crossentropy(self.output, y).mean()
 
 
 
-	def get_q_value(self, input_board_value):
+class QScoreLearner(object):
 
-		f = theano.function(
-			[self.input_board],
-			self.output,
+
+	def __init__(self, player_mark, n_nodes, n_in):
+
+		self.player_mark = player_mark
+		self.inputVector = T.dvector()
+		self.n_nodes = n_nodes
+		self.layer0 = HiddenLayer(
+			inputVector = self.inputVector,
+			n_in = n_in,
+			n_nodes = n_nodes,
+			activation = T.nnet.sigmoid)
+		self.layer1 = OutputLayerQscore(
+			inputVector = self.layer0.output,
+			n_in = n_nodes,
+			n_nodes = 1)
+		self.layerParams = self.layer0.params + self.layer1.params
+
+
+	def predict(self, input_board):
+
+		prediction_function = theano.function(
+			inputs = [self.inputVector],
+			outputs = self.layer1.output
 		)
-		return f(input_board_value)
+
+		req_index = -1
+		max_q_value = -1
+
+		for index, x in np.ndenumerate(input_board):
+
+			if x == 0:
+				new_board = np.copy(board)
+				new_board[index] = player_mark
+				q_value = prediction_function(new_board.flatten())
+				if q_value > max_q_value:
+					max_q_value = q_value
+					req_index = index
+
+		return req_index
 
 
 
-	def update_weights(self, reward_value, input_board_value):
-
-		target_vector = T.ivector()
-		cost = T.nnet.binary_crossentropy(self.output[], target_vector).mean()
-		grads = T.grad(cost, self.params)
+	def give_reward(self, reward_value, input_board):
+		y = T.lvector('y')
+		cost = self.layer1.cost(y)
+		grads = T.grad(cost, self.layerParams)
 		updates = [
-				(param_i, param_i - LEARNING_RATE_STRATEGY * grad_i) 
-				for param_i, grad_i in zip(self.params, grads)
+				(param_i, param_i - LEARNING_RATE * grad_i) 
+				for param_i, grad_i in zip(self.layerParams, grads)
 				]
-		gradF = theano.function(
-					[self.input_board],
-					cost,
+		y_value = numpy.asarray([reward_value])
+		training_function = theano.function(
+					inputs = [self.inputVector],
+					outputs = self.layer1.output,
 					updates = updates,
 					givens={
-						target_vector:target_value
+						y:y_value
 					}
 				)
-		return gradF(input_board_value)
+		return training_function(input_board.flatten())
 
 
-	def get_all_params(self):
+	def save_model(self):
+		nameOfFile = 'player' + str(self.player_mark) + 'QlearnerModelWithNodes' + str(self.n_nodes)
+		with open(nameOfFile, 'w') as f:
+                        cPickle.dump(self.layerParams, f)
 
-		f = theano.function(
-				[self.input_board],
-				self.params,
-				on_unused_input='ignore' 
-			)
-		return f(numpy.zeros((10,10)))
+	

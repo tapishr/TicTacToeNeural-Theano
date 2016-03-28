@@ -1,24 +1,29 @@
 from player import TicTacToePlayer as TTTPlayer
 from judge import TicTacToeJudge as TTTJudge
 import numpy as np
+import timeit
+import sys
 
-class TicTacToeGame:
+REWARD_WIN = 1
+REWARD_LOSE = 0
+REWARD_TIE = 0
 
-	REWARD_WIN = 1
-	REWARD_LOSE = 0
-	REWARD_TIE = 0
+TIE_MARK = -2
+PLAYER1_MARK = 1
+PLAYER2_MARK = -1
+NO_WINNER_MARK = 0
 
-	TIE_MARK = -2
-	PLAYER1_MARK = 1
-	PLAYER2_MARK = -1
-	NO_WINNER_MARK = 0
+BOARD_DIMENSION = 3#10
+GAME_MARKS = 3#5
 
-	BOARD_DIMENSION = 3#10
+TRAINING_SET = 10000
+
+class TicTacToeGame(object):
 
 	def __init__(self, player1, player2 ,print_every_move_flag=False):
 		self.players = [player1 , player2]
 		self.board = np.zeros((BOARD_DIMENSION, BOARD_DIMENSION),np.int8)
-		self.judge = TTTJudge()
+		self.judge = TTTJudge(GAME_MARKS)
 		self.print_every_move_flag = print_every_move_flag
 
 	def play_game(self):
@@ -39,13 +44,6 @@ class TicTacToeGame:
 				winner = self.judge.get_result(self.board)
 				if winner != NO_WINNER_MARK :
 					game_over = True
-					# if self.print_every_move_flag:
-					print 'count = ',count
-					if winner == TIE_MARK:
-						print 'Game Tied'
-					else :
-						if self.print_every_move_flag:
-							print 'Winner = ', player.player_mark
 					break
 		self.reward_winner(winner)
 		return winner
@@ -71,33 +69,26 @@ class TicTacToeGame:
 
 
 if __name__ == '__main__':
-	player1 = TTTPlayer(PLAYER1_MARK, 0.2)
 
+	start_time = timeit.default_timer()
 
-	player2 = TTTPlayer(PLAYER2_MARK, 0.2)
+	for n_nodes in range(2,20):
 
-	
-	#print 'Random Training'
-	i = 0
-	response = 'y'
-	# player1.load_progress()
-	# player2.load_progress()
-	while response == 'y':
-		# player2.strategy = [(1,0),(1,2),(1,1)]
+		player1 = TTTPlayer(PLAYER1_MARK, 1, n_nodes)
+		player2 = TTTPlayer(PLAYER2_MARK, 1, n_nodes)
+		print "Random Training for nodes = ", n_nodes
+
+		for i in range(TRAINING_SET):
+
+			sys.stdout.write ('\rGame %i/%i' %(i, TRAINING_SET))
+			sys.stdout.flush()
+			game = TicTacToeGame(player1, player2)
+			winner = game.play_game()
+
+		end_time = timeit.default_timer()
 		
-		i += 1
-		print 'Game ',i
-		game = TicTacToeGame(player1, player2)
-		winner = game.play_game()
-		print 'Winner = Player ', winner
-		# print 'Player 1 Wins = ', player1.gamesWon
-		# print 'Player 2 Wins = ', player2.gamesWon
-		
-		# if winner != -1:
-		# 	response = 'y'
-		response = raw_input("Continue?[y/n]")
-		# if i%100 == 0:
-		# 	player1.store_progress()
-		# 	player2.store_progress()
+		player1.store_progress()
+		player2.store_progress()
 
+		print 'Total Time = ', (end_time-start_time)/60, ' for n_nodes = ', n_nodes
 

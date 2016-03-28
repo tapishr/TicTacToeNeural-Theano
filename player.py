@@ -1,11 +1,13 @@
 import numpy as np
 import random
 #from learner import DeepLearner
-from learner3X3 import DeepLearner
+from learner3X3 import QScoreLearner
 
-class TicTacToePlayer:
+#need to add global vars
 
-	def __init__(self, player_mark, randomness = 0.5, load_params_flag = False, human_player = False, strategy = None):
+class TicTacToePlayer(object):
+
+	def __init__(self, player_mark, randomness = 0.5, n_nodes = 20, load_params_flag = False, human_player = False, strategy = None):
 		self.player_mark = player_mark
 		self.randomness = randomness
 		self.gamesWon = 0
@@ -16,7 +18,7 @@ class TicTacToePlayer:
 		if load_params_flag:
 			self.load_progress()
 		else:
-			self.playerNetwork = DeepLearner()
+			self.playerNetwork = QScoreLearner(self.player_mark, n_nodes, 3*3)
 		
 
 	def make_a_move (self, board):
@@ -58,37 +60,25 @@ class TicTacToePlayer:
 			if board[selected_cell/shape[1],selected_cell%shape[1]] == 0:
 				empty_cell = True
 		
-		return (selected_cell/shape[1],selected_cell%shape[1])
+		return (selected_cell/shape[0],selected_cell%shape[1])
 
 
 	def trained_move (self, board):
-		new_board = np.copy(board)
-		q_values = []
-		for index, x in np.ndenumerate(board):
-			if x!= 0:
-				continue
-			new_board[index] = self.player_mark
-			q_values = q_values + [(self.playerNetwork.get_q_value(new_board), index)]
-			new_board[index] = 0
-
-		max_q_value, required_index = max(q_values)
-		# print 'q_values = ', q_values
-		print 'max_q_value = ', max_q_value
-		print 'required_index', required_index
-		return required_index
+		
+		index1d = self.playerNetwork.predict(board)
+		return (index1d/board.shape[1], index1d%board.shape[1])
 
 
 	def pass_rewards(self, board, reward):
-		self.playerNetwork.assign_reward(reward, board)
+		return self.playerNetwork.give_reward(reward, board)
 		#print 'Player',self.player_mark, ' cost = ',self.playerNetwork.assign_reward(reward, board)
 
 	def store_progress(self):
-		filename = 'player'+str(self.player_mark)
-		np.save(filename, self.playerNetwork.get_all_params())
+		self.playerNetwork.save_model()
 
-	def load_progress(self):
-		filename = 'player' + str(self.player_mark) + '.npy'
-		self.playerNetwork = DeepLearner(np.load(filename))
+	# def load_progress(self):
+	# 	filename = 'player' + str(self.player_mark) + '.npy'
+	# 	self.playerNetwork = DeepLearner(np.load(filename))
 
 def testing_with_random(board):
 	player = TicTacToePlayer(1,1.0)

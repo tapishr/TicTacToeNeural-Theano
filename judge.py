@@ -1,14 +1,15 @@
 import numpy as np
 
-class TicTacToeJudge:
+TIE_MARK = -2
+PLAYER1_MARK = 1
+PLAYER2_MARK = -1
+NO_WINNER_MARK = 0
 
-	TIE_MARK = -2
-	PLAYER1_MARK = 1
-	PLAYER2_MARK = -1
-	NO_WINNER_MARK = 0
+class TicTacToeJudge(object):
 	
-	def __init__ (self):
+	def __init__ (self, num_contigous_marks_to_win = 3):
 		self.board = []
+		self.n_winmarks = num_contigous_marks_to_win
 
 	def check_move (self, new_board, old_board, player_mark):
 		count = 0
@@ -19,11 +20,10 @@ class TicTacToeJudge:
 					count += 1
 				else :
 					legal_move = False
-					raise Exception ('Illegal Move : Not your turn')
 		
 		if count != 1:
 			legal_move = False
-			raise Exception('Illegal Move : Multiple moves in single attempt')
+		
 		return legal_move
 
 
@@ -31,7 +31,7 @@ class TicTacToeJudge:
 		self.board = board
 		winner = NO_WINNER_MARK
 		for index, x in np.ndenumerate(self.board):
-			if x == 1 or x == -1 :
+			if x == PLAYER1_MARK or x == PLAYER2_MARK :
 				winner = self.get_winner(index)
 				if winner != NO_WINNER_MARK:
 					break
@@ -80,7 +80,7 @@ class TicTacToeJudge:
 		shape = self.board.shape
 		for k in range(4):
 			if self.check_index(i+k+1, j+k+1, shape) and self.board[i+k+1, j+k+1] == x :
-				if k == 3:#1:
+				if k == self.n_winmarks-2:
 					winner = x
 			else :
 				break
@@ -94,7 +94,7 @@ class TicTacToeJudge:
 
 		for k in range(4):
 			if self.check_index(i+k+1, j, shape) and self.board[i+k+1, j] == x :
-				if k == 3:#1:
+				if k == self.n_winmarks - 2:
 					winner = x
 			else :
 				break
@@ -109,7 +109,7 @@ class TicTacToeJudge:
 
 		for k in range(4):
 			if self.check_index(i+k+1, j-k-1, shape) and self.board[i+k+1, j-k-1] == x :
-				if k == 3:#1:
+				if k == self.n_winmarks-2:
 					winner = x
 			else :
 				break
@@ -124,7 +124,7 @@ class TicTacToeJudge:
 
 		for k in range(4):
 			if self.check_index(i, j+k+1, shape) and self.board[i, j+k+1] == x :
-				if k == 3:#1:
+				if k == self.n_winmarks-2:
 					winner = x
 			else :
 				break

@@ -3,7 +3,7 @@ import theano
 import theano.tensor as T
 from theano.tensor.nnet import conv
 
-class DeepLearner:
+class DeepLearner(object):
 
 	LEARNING_RATE = 0.8
 
