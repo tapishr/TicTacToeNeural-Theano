@@ -1,8 +1,7 @@
 from player import TicTacToePlayer as TTTPlayer
 from judge import TicTacToeJudge as TTTJudge
 import numpy as np
-import timeit
-import sys
+
 
 REWARD_WIN = 1
 REWARD_LOSE = 0
@@ -68,27 +67,5 @@ class TicTacToeGame(object):
 			winning_player.gamesWon += 1
 
 
-if __name__ == '__main__':
 
-	start_time = timeit.default_timer()
-
-	for n_nodes in range(2,20):
-
-		player1 = TTTPlayer(PLAYER1_MARK, 1, n_nodes)
-		player2 = TTTPlayer(PLAYER2_MARK, 1, n_nodes)
-		print "Random Training for nodes = ", n_nodes
-
-		for i in range(TRAINING_SET):
-
-			sys.stdout.write ('\rGame %i/%i' %(i, TRAINING_SET))
-			sys.stdout.flush()
-			game = TicTacToeGame(player1, player2)
-			winner = game.play_game()
-
-		end_time = timeit.default_timer()
-		
-		player1.store_progress()
-		player2.store_progress()
-
-		print 'Total Time = ', (end_time-start_time)/60, ' for n_nodes = ', n_nodes
 
