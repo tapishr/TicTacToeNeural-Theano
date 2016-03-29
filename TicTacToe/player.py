@@ -76,28 +76,6 @@ class TicTacToePlayer(object):
 	def store_progress(self):
 		self.playerNetwork.save_model()
 
-	# def load_progress(self):
-	# 	filename = 'player' + str(self.player_mark) + '.npy'
-	# 	self.playerNetwork = DeepLearner(np.load(filename))
 
-def testing_with_random(board):
-	player = TicTacToePlayer(1,1.0)
-	
-	return player.make_a_move(board)
-
-if __name__ == '__main__':
-	board = np.array([
-		[ 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 ],
-		[ 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 ],
-		[ 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 ],
-		[ 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 ],
-		[ 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 ],
-		[ 1 , 1 , 1 , 1 , 1 , 0 , 1 , 1 , 1 , 1 ],
-		[ 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 ],
-		[ 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 ],
-		[ 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 ],
-		[ 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 0 , 0 ]
-		])
-	print testing_with_random(board)
 
 

@@ -1,17 +1,19 @@
 import numpy as np
+import game.TicTacToeGame as TTTGame
 
-TIE_MARK = -2
-PLAYER1_MARK = 1
-PLAYER2_MARK = -1
-NO_WINNER_MARK = 0
 
 class TicTacToeJudge(object):
+
+	TIE_MARK = -2
+	NO_WINNER_MARK = 0
+	ILLEGAL_MOVE_MARK = 2
+
 	
-	def __init__ (self, num_contigous_marks_to_win = 3):
+	def __init__ (self, num_contigous_marks_to_win):
 		self.board = []
 		self.n_winmarks = num_contigous_marks_to_win
 
-	def check_move (self, new_board, old_board, player_mark):
+	def is_move_legal(self, new_board, old_board, player_mark):
 		count = 0
 		legal_move = True
 		for index, x in np.ndenumerate(new_board):
@@ -31,7 +33,7 @@ class TicTacToeJudge(object):
 		self.board = board
 		winner = NO_WINNER_MARK
 		for index, x in np.ndenumerate(self.board):
-			if x == PLAYER1_MARK or x == PLAYER2_MARK :
+			if x == TTTGame.PLAYER1_MARK or x == TTTGame.PLAYER2_MARK :
 				winner = self.get_winner(index)
 				if winner != NO_WINNER_MARK:
 					break
@@ -130,57 +132,4 @@ class TicTacToeJudge(object):
 				break
 
 		return winner
-if __name__ == '__main__':
-	board = np.array([
-		[ 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 ],
-		[ 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 ],
-		[ 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 ],
-		[ 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 ],
-		[ 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 ],
-		[ 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 ],
-		[ 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 ],
-		[ 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 ],
-		[ 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 ],
-		[ 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 ]
-		])
-	board1diag = np.array([
-		[ 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 ],
-		[ 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 ],
-		[ 0 , 0 , 0 , 1 , 0 , 0 , 0 , 0 , 0 , 0 ],
-		[ 0 , 0 , 0 , 0 , 1 , 0 , 0 , 0 , 0 , 0 ],
-		[ 0 , 0 , 0 , 0 , 0 , 1 , 0 , 0 , 0 , 0 ],
-		[ 0 , 0 , 0 , 0 , 0 , 0 , 1 , 0 , 0 , 0 ],
-		[ 0 , 0 , 0 , 0 , 0 , 0 , 0 , 1 , 0 , 0 ],
-		[ 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 ],
-		[ 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 ],
-		[ 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 ]
-		])
-	board2hor = np.array([
-		[ 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 ],
-		[ 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 ],
-		[ 0 , 0 , 0 ,-1 ,-1 ,-1 ,-1 ,-1 , 0 , 0 ],
-		[ 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 ],
-		[ 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 ],
-		[ 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 ],
-		[ 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 ],
-		[ 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 ],
-		[ 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 ],
-		[ 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 ]
-		])
-	board1vert = np.array([
-		[ 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 ],
-		[ 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 ],
-		[ 0 , 0 , 0 , 1 , 0 , 0 , 0 , 0 , 0 , 0 ],
-		[ 0 , 0 , 0 , 1 , 0 , 0 , 0 , 0 , 0 , 0 ],
-		[ 0 , 0 , 0 , 1 , 0 , 0 , 0 , 0 , 0 , 0 ],
-		[ 0 , 0 , 0 , 1 , 0 , 0 , 0 , 0 , 0 , 0 ],
-		[ 0 , 0 , 0 , 1 , 0 , 0 , 0 , 0 , 0 , 0 ],
-		[ 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 ],
-		[ 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 ],
-		[ 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 ]
-		])
-	tttJ = TicTacToeJudge()
-	print tttJ.get_result(board)
-	print tttJ.get_result(board1diag)
-	print tttJ.get_result(board2hor)
-	print tttJ.get_result(board1vert)
+
