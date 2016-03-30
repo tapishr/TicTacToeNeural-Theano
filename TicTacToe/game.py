@@ -1,17 +1,14 @@
 from player import TicTacToePlayer as TTTPlayer
-from judge import TicTacToeJudge as TTTJudge
+import judge
 import numpy as np
 
+PLAYER1_MARK = 1
+PLAYER2_MARK = -1
+REWARD_WIN = 1
+REWARD_LOSE = 0
+REWARD_TIE = 0
 
 class TicTacToeGame(object):
-
-	PLAYER1_MARK = 1
-	PLAYER2_MARK = -1
-
-	REWARD_WIN = 1
-	REWARD_LOSE = 0
-	REWARD_TIE = 0
-
 
 	def __init__(self, player1, player2 , type_of_game, print_every_move_flag=False):
 		self.players = [player1 , player2]
@@ -20,7 +17,7 @@ class TicTacToeGame(object):
 		else :
 			board_dimension = (type_of_game, type_of_game)
 		self.board = np.zeros((board_dimension[0], board_dimension[1]),np.int8)
-		self.judge = TTTJudge(type_of_game)
+		self.judge = judge.TicTacToeJudge(type_of_game, (PLAYER1_MARK,PLAYER2_MARK))
 		self.print_every_move_flag = print_every_move_flag
 
 	def play_game(self):
@@ -37,11 +34,11 @@ class TicTacToeGame(object):
 						print '\nPlayer ', player.player_mark
 						print self.board
 				else :
-					winner = TTTJudge.ILLEGAL_MOVE_MARK
+					winner = judge.ILLEGAL_MOVE_MARK
 					game_over = True
 					break
 				winner = self.judge.get_result(self.board)
-				if winner != TTTJudge.NO_WINNER_MARK :
+				if winner != judge.NO_WINNER_MARK :
 					game_over = True
 					break
 		self.reward_winner(winner)
@@ -51,7 +48,7 @@ class TicTacToeGame(object):
 		
 		self.players[0].gamesPlayed += 1
 		self.players[1].gamesPlayed += 1
-		if winner == TTTJudge.TIE_MARK:
+		if winner == judge.TIE_MARK:
 			self.players[0].pass_rewards(self.board, REWARD_TIE)
 			self.players[1].pass_rewards(self.board, REWARD_TIE)
 		elif winner == PLAYER1_MARK or PLAYER2_MARK:

@@ -1,17 +1,15 @@
 import numpy as np
-import game.TicTacToeGame as TTTGame
 
+TIE_MARK = -2
+NO_WINNER_MARK = 0
+ILLEGAL_MOVE_MARK = 2
 
 class TicTacToeJudge(object):
 
-	TIE_MARK = -2
-	NO_WINNER_MARK = 0
-	ILLEGAL_MOVE_MARK = 2
-
-	
-	def __init__ (self, num_contigous_marks_to_win):
+	def __init__ (self, num_contigous_marks_to_win, player_marks):
 		self.board = []
 		self.n_winmarks = num_contigous_marks_to_win
+		self.player_marks = player_marks
 
 	def is_move_legal(self, new_board, old_board, player_mark):
 		count = 0
@@ -33,7 +31,7 @@ class TicTacToeJudge(object):
 		self.board = board
 		winner = NO_WINNER_MARK
 		for index, x in np.ndenumerate(self.board):
-			if x == TTTGame.PLAYER1_MARK or x == TTTGame.PLAYER2_MARK :
+			if x == self.player_marks[0] or x == self.player_marks[1] :
 				winner = self.get_winner(index)
 				if winner != NO_WINNER_MARK:
 					break

@@ -7,25 +7,26 @@ from learner3X3 import QScoreLearner
 
 class TicTacToePlayer(object):
 
-	def __init__(self, player_mark, randomness = 0.5, n_nodes = 20, load_params_flag = False, human_player = False, strategy = None):
+	def __init__(self, player_mark, randomness = None, n_nodes = None, n_in = None, file_name = None, human_player = False, strategy = None):
 		self.player_mark = player_mark
 		self.randomness = randomness
 		self.gamesWon = 0
 		self.gamesPlayed = 0
 		self.human_player = human_player
 		self.strategy = strategy
-
-		if load_params_flag:
-			self.load_progress()
-		else:
-			self.playerNetwork = QScoreLearner(self.player_mark, n_nodes, 3*3)
+		self.playerNetwork = None
+		if not randomness is None:
+			if file_name == None:
+				self.playerNetwork = QScoreLearner(self.player_mark, n_nodes = n_nodes, n_in = n_in)
+			else :
+				self.playerNetwork = QScoreLearner(self.player_mark, file_name = file_name)
 		
 
 	def make_a_move (self, board):
 		new_board = np.copy(board)
 		move = ()
 		if self.human_player:
-			response = input("Enter Board Cell Number ")
+			response = input("Enter Board Cell Number ") - 1
 			shape = board.shape
 			move = (response/shape[1], response%shape[1])
 
@@ -65,12 +66,13 @@ class TicTacToePlayer(object):
 
 	def trained_move (self, board):
 		
-		index1d = self.playerNetwork.predict(board)
-		return (index1d/board.shape[1], index1d%board.shape[1])
+		index = self.playerNetwork.predict(board)
+		return index
 
 
 	def pass_rewards(self, board, reward):
-		return self.playerNetwork.give_reward(reward, board)
+		if not self.playerNetwork is None:
+			return self.playerNetwork.give_reward(reward, board)
 		#print 'Player',self.player_mark, ' cost = ',self.playerNetwork.assign_reward(reward, board)
 
 	def store_progress(self):

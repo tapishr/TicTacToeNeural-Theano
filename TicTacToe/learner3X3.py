@@ -8,7 +8,7 @@ LEARNING_RATE = 0.09
 
 class HiddenLayer(object):
 
-	def __init__(self, inputVector, n_in, n_nodes, activation, W = None, b = None):
+	def __init__(self, inputVector, n_in = None, n_nodes = None, activation = None, W = None, b = None):
 
 		if W is None:
 			
@@ -45,7 +45,7 @@ class HiddenLayer(object):
 
 class OutputLayerQscore(object) :
 
-	def __init__ (self, inputVector, n_in, n_nodes, W = None, b = None):
+	def __init__ (self, inputVector, n_in = None, n_nodes = None, W = None, b = None):
 		 
 		if W is None:
 		 	rng = numpy.random.RandomState(23452)
@@ -90,21 +90,33 @@ class OutputLayerQscore(object) :
 class QScoreLearner(object):
 
 
-	def __init__(self, player_mark, n_nodes, n_in):
+	def __init__(self, player_mark, n_nodes = None, n_in = None, file_name = None):
 
 		self.player_mark = player_mark
-		self.inputVector = T.dvector()
+		self.inputVector = T.dvector('inputVector')
 		self.n_nodes = n_nodes
-		self.layer0 = HiddenLayer(
-			inputVector = self.inputVector,
-			n_in = n_in,
-			n_nodes = n_nodes,
-			activation = T.nnet.sigmoid)
-		self.layer1 = OutputLayerQscore(
-			inputVector = self.layer0.output,
-			n_in = n_nodes,
-			n_nodes = 1)
-		self.layerParams = self.layer0.params + self.layer1.params
+		if file_name is None:
+			self.layer0 = HiddenLayer(
+				inputVector = self.inputVector,
+				n_in = n_in,
+				n_nodes = n_nodes,
+				activation = T.nnet.sigmoid)
+			self.layer1 = OutputLayerQscore(
+				inputVector = self.layer0.output,
+				n_in = n_nodes,
+				n_nodes = 1)
+			self.layerParams = self.layer0.params + self.layer1.params
+		else :
+			self.layerParams = cPickle.load(open(file_name))
+			self.layer0 = HiddenLayer(
+				inputVector = self.inputVector,
+				activation = T.nnet.sigmoid,
+				W = self.layerParams[0],
+				b = self.layerParams[1])
+			self.layer1 = OutputLayerQscore(
+				inputVector = self.layer0.output,
+				W = self.layerParams[2],
+				b = self.layerParams[3])
 
 
 	def predict(self, input_board):
@@ -117,11 +129,11 @@ class QScoreLearner(object):
 		req_index = -1
 		max_q_value = -1
 
-		for index, x in np.ndenumerate(input_board):
+		for index, x in numpy.ndenumerate(input_board):
 
 			if x == 0:
-				new_board = np.copy(board)
-				new_board[index] = player_mark
+				new_board = numpy.copy(input_board)
+				new_board[index] = self.player_mark
 				q_value = prediction_function(new_board.flatten())
 				if q_value > max_q_value:
 					max_q_value = q_value
