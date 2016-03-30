@@ -36,8 +36,9 @@ Winning in a left to right diagonal -
 
 ### Contents
 
-- learner.py - contains the CNN, implemented using Theano.
-- player.py - implements the player of Tic Tac Toe
-- judge.py - implements a judge which checks if illegal moves have been made. It also decides and declares the winner.
-- game.py - initializes the game, the players and the judge.
-- learner3X3.py - CNN for learning the normal 3 X 3 version of Tic Tac Toe.
+- experiments.py - initiates the experiments required to be performed.
+- TicTacToe/learner.py - contains the CNN, implemented using Theano.
+- TicTacToe/player.py - implements the player of Tic Tac Toe
+- TicTacToe/judge.py - implements a judge which checks if illegal moves have been made. It also decides and declares the winner.
+- TicTacToe/game.py - initializes the game, the players and the judge.
+- TicTacToe/learner3X3.py - NN for learning the normal 3 X 3 version of Tic Tac Toe.
