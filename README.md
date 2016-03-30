@@ -2,6 +2,7 @@
 In this code, an attempt is made to get a better understanding of Neural Networks through experiments. A neural network is made to learn how to play 2 variations of Tic Tac Toe and changes are made to the number of nodes in the hidden layer(s) to understand how feature representation gets affected. The Tic Tac Toe game is also represented in 3 different ways for the Neural Network to learn, to see how different reperesentations affect learning.
 
 The 3 types of representation of a Tic Tac Toe game used in the code are -
+
 1. Q-score  - The whole Tic Tac Toe board is given as an input to the network and it is supposed to give a score to the board. Winning board combinations are supposed to have better scores and losing combinations a bad score.
 2. Index-score - The Tic Tac Toe boars is given as an input to the network along with an index and the network is supposed to predict whether making a move on that index will be a good choice or bad.
 3. Index-probability - The Tic Tac Toe is given as an input and the network is supposed to tell the probability of winning for each possible move.
