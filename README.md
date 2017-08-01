@@ -4,7 +4,7 @@ In this code, an attempt is made to get a better understanding of Neural Network
 The 3 types of representation of a Tic Tac Toe game used in the code are -
 
 1. Q-score  - The whole Tic Tac Toe board is given as an input to the network and it is supposed to give a score to the board. Winning board combinations are supposed to have better scores and losing combinations a bad score.
-2. Index-score - The Tic Tac Toe boars is given as an input to the network along with an index and the network is supposed to predict whether making a move on that index will be a good choice or bad.
+2. Index-score - The Tic Tac Toe board is given as an input to the network along with an index and the network is supposed to predict whether making a move on that index will be a good choice or bad.
 3. Index-probability - The Tic Tac Toe is given as an input and the network is supposed to tell the probability of winning for each possible move.
 
 Representation 1 and 2 mentioned above differ from representation 3 in 2 ways - Firstly, if representation 1 or 2 is used, then for making a move, the network has to be queried multiple times, to ascertain the best possible move. For representation 3, the network gives the best move in a single query.
